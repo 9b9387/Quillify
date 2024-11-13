@@ -1,9 +1,9 @@
 // @see - https://www.electron.build/configuration/configuration
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "YourAppID",
+  "appId": "cool.biubiu.quillify",
   "asar": true,
-  "productName": "YourAppName",
+  "productName": "Quillify",
   "directories": {
     "output": "release/${version}"
   },
@@ -15,7 +15,9 @@
     "target": [
       "dmg"
     ],
-    "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
+    "artifactName": "${productName}-Mac-${version}-Installer.${ext}",
+    "icon": "build/icons/icon.icns",
+    "category": "public.app-category.productivity"
   },
   "win": {
     "target": [
