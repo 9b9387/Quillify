@@ -17,7 +17,33 @@
     ],
     "artifactName": "${productName}-Mac-${version}-Installer.${ext}",
     "icon": "build/icons/icon.icns",
-    "category": "public.app-category.productivity"
+    "category": "public.app-category.productivity",
+    "fileAssociations": [
+      {
+        "ext": "md",
+        "name": "Markdown",
+        "role": "Editor",
+        "icon": "build/icons/md.icns"
+      },
+      {
+        "ext": "markdown",
+        "name": "Markdown",
+        "role": "Editor",
+        "icon": "build/icons/md.icns"
+      },
+      {
+        "ext": "mkd",
+        "name": "Markdown",
+        "role": "Editor",
+        "icon": "build/icons/md.icns"
+      },
+      {
+        "ext": "mdown",
+        "name": "Markdown",
+        "role": "Editor",
+        "icon": "build/icons/md.icns"
+      }
+    ]
   },
   "win": {
     "target": [
@@ -28,7 +54,21 @@
         ]
       }
     ],
-    "artifactName": "${productName}-Windows-${version}-Setup.${ext}"
+    "artifactName": "${productName}-Windows-${version}-Setup.${ext}",
+    "fileAssociations": [
+      {
+        "ext": "md",
+        "name": "Markdown",
+        "description": "Markdown File",
+        "icon": "build/icons/md.ico"
+      },
+      {
+        "ext": "markdown",
+        "name": "Markdown",
+        "description": "Markdown File",
+        "icon": "build/icons/md.ico"
+      }
+    ]
   },
   "nsis": {
     "oneClick": false,
