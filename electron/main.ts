@@ -29,28 +29,31 @@ function handleFileOpen(filePath: string) {
     if (!filePath) return
 
     try {
+        // 添加文件检查
+        const stats = fs.statSync(filePath)
+        if (!stats.isFile()) {
+            console.log('Not a file:', filePath)
+            return
+        }
+
         const content = fs.readFileSync(filePath, 'utf-8')
         console.log('Reading file:', filePath)
 
-        if (!win) {
+        // 如果窗口不存在或已销毁，创建新窗口
+        if (!win || win.isDestroyed()) {
+            console.log('Creating new window...')
             createWindow()
-        }
-        else {
+            
+            // 等待窗口创建完成后再发送内容
+            win?.once('ready-to-show', () => {
+                sendContentToWindow(content, filePath)
+            })
+        } else {
+            console.log('Using existing window...')
             win.show()
             win.moveTop()
             win.focus()
-        }
-
-        // 等待窗口加载完成后发送事件
-        const sendContent = () => {
-            console.log('Sending content to renderer')
-            win?.webContents.send('file-opened', { content, filePath })
-        }
-
-        if (win?.webContents.isLoading()) {
-            win.webContents.once('did-finish-load', sendContent)
-        } else {
-            sendContent()
+            sendContentToWindow(content, filePath)
         }
 
     } catch (error) {
@@ -80,18 +83,30 @@ function createWindow() {
     win = new BrowserWindow({
         width: 900,
         height: 670,
-        icon: path.join(process.env.VITE_PUBLIC, 'icon.png'), // 窗口图标
+        icon: path.join(process.env.VITE_PUBLIC, 'icon.png'),
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
             preload: path.join(__dirname, 'preload.mjs'),
-            webSecurity: false  // 在开发时可以设置为 false 以便调试
+            webSecurity: false
         },
+        show: false,  // 先不显示窗口
+    })
+
+    // 监听窗口关闭事件
+    win.on('closed', () => {
+        console.log('Window closed')
+        win = null  // 重要：窗口关闭时设置为 null
+    })
+
+    // 窗口准备好时显示
+    win.once('ready-to-show', () => {
+        win?.show()
+        win?.focus()
     })
 
     // 添加窗口加载完成的处理
     win.webContents.on('did-finish-load', () => {
-        console.log('Window loaded')
         win?.webContents.send('main-process-message', 'window-loaded')
     })
 
@@ -100,26 +115,24 @@ function createWindow() {
     } else {
         win.loadFile(path.join(RENDERER_DIST, 'index.html'))
     }
-
-    // test code!
-    // handleFileOpen("")
 }
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
+// 修改 window-all-closed 事件处理
 app.on('window-all-closed', () => {
+    console.log('All windows closed')
+    win = null  // 确保设置为 null
     if (process.platform !== 'darwin') {
         app.quit()
-        win = null
     }
 })
 
+// 修改 activate 事件处理
 app.on('activate', () => {
-    // On OS X it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) {
+    console.log('App activated')
+    if (!win || win.isDestroyed()) {  // 检查窗口是否存在或已销毁
         createWindow()
+    } else {
+        win.show()
     }
 })
 
@@ -149,5 +162,21 @@ if (process.argv.length >= 2) {
                 fileToOpen = filePath;
             }
         }
+    }
+}
+
+// 添加发送内容的辅助函数
+function sendContentToWindow(content: string, filePath: string) {
+    if (!win || win.isDestroyed()) return
+
+    const sendContent = () => {
+        console.log('Sending content to renderer')
+        win?.webContents.send('file-opened', { content, filePath })
+    }
+
+    if (win.webContents.isLoading()) {
+        win.webContents.once('did-finish-load', sendContent)
+    } else {
+        sendContent()
     }
 }
