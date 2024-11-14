@@ -37,6 +37,7 @@ function handleFileOpen(filePath: string) {
         }
         else {
             win.show()
+            win.moveTop()
             win.focus()
         }
 
@@ -57,14 +58,23 @@ function handleFileOpen(filePath: string) {
     }
 }
 
+let fileToOpen: string | null = null;
+
 app.on('will-finish-launching', () => {
-    // 处理文件打开事件
+    // 处理通过 Finder 打开文件的事件
     app.on('open-file', (event, filePath) => {
-        event.preventDefault()
-        console.log('Open file triggered:', filePath)
-        handleFileOpen(filePath)
-    })
-})
+        event.preventDefault();
+        console.log('Open file triggered:', filePath);
+        
+        if (app.isReady()) {
+            // 如果应用已经准备好，直接打开文件
+            handleFileOpen(filePath);
+        } else {
+            // 如果应用还没准备好，存储文件路径
+            fileToOpen = filePath;
+        }
+    });
+});
 
 function createWindow() {
     win = new BrowserWindow({
@@ -114,10 +124,30 @@ app.on('activate', () => {
 })
 
 app.whenReady().then(() => {
-    createWindow()
-})
-
+    createWindow();
+    
+    // 如果有待打开的文件，现在打开它
+    if (fileToOpen) {
+        handleFileOpen(fileToOpen);
+        fileToOpen = null;
+    }
+});
 
 if (process.platform === 'darwin') {
     app.dock.setIcon(path.join(process.env.VITE_PUBLIC, 'icon.png'))
+}
+
+// 添加命令行参数的处理
+if (process.argv.length >= 2) {
+    const filePath = process.argv[1];
+    if (filePath && !filePath.startsWith('-')) {
+        // 检查是否是有效的文件路径
+        if (fs.existsSync(filePath)) {
+            if (app.isReady()) {
+                handleFileOpen(filePath);
+            } else {
+                fileToOpen = filePath;
+            }
+        }
+    }
 }

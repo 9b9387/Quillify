@@ -14,13 +14,26 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@emotion/css": "^11.13.4",
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
     "@monaco-editor/react": "^4.6.0",
+    "@remirror/extension-list": "^3.0.1",
+    "@remirror/extension-markdown": "^3.0.1",
+    "@remirror/pm": "^3.0.0",
+    "@remirror/react": "^3.0.0",
+    "@remirror/react-editors": "^2.0.1",
+    "@remirror/react-ui": "^1.0.0",
+    "@remirror/styles": "^3.0.0",
     "@types/marked": "^6.0.0",
+    "create-context-state": "^2.0.3",
     "github-markdown-css": "^5.7.0",
     "marked": "^15.0.0",
     "monaco-editor": "^0.52.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "refractor": "^4.8.1",
+    "remirror": "^3.0.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.5.0",
@@ -75,7 +88,9 @@
       "buildResources": "build"
     },
     "mac": {
-      "target": ["dmg"],
+      "target": [
+        "dmg"
+      ],
       "category": "public.app.category.productivity"
     },
     "dmg": {
