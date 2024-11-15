@@ -83,13 +83,16 @@ function createWindow() {
     win = new BrowserWindow({
         width: 900,
         height: 670,
+        frame: false,
         icon: path.join(process.env.VITE_PUBLIC, 'icon.png'),
+        titleBarStyle: 'hiddenInset',
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
             preload: path.join(__dirname, 'preload.mjs'),
             webSecurity: false
         },
+        trafficLightPosition: { x: 10, y: 10 },
         show: false,  // 先不显示窗口
     })
 

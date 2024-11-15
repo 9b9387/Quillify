@@ -1,5 +1,7 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRemirrorContext, Remirror, useRemirror } from '@remirror/react';
+import { Box } from '@mui/material';
+import ReactMarkdown from 'react-markdown'; // 需要安装 react-markdown
 import { MarkdownExtension } from '@remirror/extension-markdown';
 import {
     BoldExtension,
@@ -39,7 +41,12 @@ function EditorContent() {
     return null;
 }
 
-const Editor: React.FC = () => {
+interface EditorProps {
+    viewMode: 'preview' | 'split' | 'source';
+}
+
+const Editor: React.FC<EditorProps> = ({ viewMode }) => {
+    const [content, setContent] = useState('');
     const { manager, state } = useRemirror({
         extensions: () => [
             // Markdown 核心
@@ -81,21 +88,46 @@ const Editor: React.FC = () => {
         content: ''
     });
 
+    // 更新 handleChange 的类型定义
+    const handleChange = ({ helpers }: { helpers: { getMarkdown: () => string } }) => {
+        setContent(helpers.getMarkdown());
+    };
+
+
+    const renderEditor = () => (
+        <Remirror
+            manager={manager}
+            initialContent={state}
+            autoFocus
+            autoRender="end"
+            classNames={['remirror-editor', 'markdown-body']}
+            onChange={handleChange}
+        >
+            <EditorContent />
+        </Remirror>
+    );
+
+    const renderPreview = () => (
+        <Box className="markdown-preview" sx={{ p: 2, height: '100%', overflow: 'auto' }}>
+            <ReactMarkdown>{content}</ReactMarkdown>
+        </Box>
+    );
+
     return (
-        <div style={{ height: '100vh', width: '100%' }}>
-            <Remirror
-                manager={manager}
-                initialContent={state}
-                autoFocus
-                autoRender="end"
-                classNames={[
-                    'remirror-editor',
-                    'markdown-body'
-                ]}
-            >
-                <EditorContent />
-            </Remirror>
-        </div>
+        <Box sx={{ height: '100%', display: 'flex' }}>
+            {viewMode === 'source' && renderEditor()}
+            {viewMode === 'preview' && renderPreview()}
+            {viewMode === 'split' && (
+                <>
+                    <Box sx={{ width: '50%', borderRight: 1, borderColor: 'divider' }}>
+                        {renderEditor()}
+                    </Box>
+                    <Box sx={{ width: '50%' }}>
+                        {renderPreview()}
+                    </Box>
+                </>
+            )}
+        </Box>
     );
 };
 
