@@ -1,11 +1,9 @@
 import { useMemo, useState } from 'react';
-
-import { Box } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
-import Editor from "./components/MarkdownEditor";
+import Layout from './components/Layout';
 import TitleBar from "./components/TitleBar";
 import TextEditor from "./components/TextEditor";
 
@@ -25,14 +23,18 @@ function App() {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-                <TitleBar viewMode={viewMode} setViewMode={setViewMode} />
-                {/* <Box sx={{ flex: 1, overflow: 'hidden' }}>
-                    <Editor viewMode={viewMode} />
-                </Box> */}
-
-                <TextEditor />
-            </Box>
+            <Layout 
+                header={
+                    <TitleBar viewMode={viewMode} setViewMode={setViewMode} />
+                }
+                content={
+                    <TextEditor />
+                }
+                // 示例：如果需要侧边栏
+                // sidebar={<SideBar />}
+                // 示例：如果需要底部状态栏
+                // footer={<StatusBar />}
+            />
         </ThemeProvider>
     );
 }
