@@ -7,6 +7,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 
 import Editor from "./components/MarkdownEditor";
 import TitleBar from "./components/TitleBar";
+import TextEditor from "./components/TextEditor";
 
 function App() {
     const [viewMode, setViewMode] = useState<'preview' | 'split' | 'source'>('source');
@@ -26,9 +27,11 @@ function App() {
             <CssBaseline />
             <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
                 <TitleBar viewMode={viewMode} setViewMode={setViewMode} />
-                <Box sx={{ flex: 1, overflow: 'hidden' }}>
+                {/* <Box sx={{ flex: 1, overflow: 'hidden' }}>
                     <Editor viewMode={viewMode} />
-                </Box>
+                </Box> */}
+
+                <TextEditor />
             </Box>
         </ThemeProvider>
     );
