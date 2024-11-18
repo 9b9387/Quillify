@@ -1,21 +1,20 @@
-import { AppBar, Toolbar, Typography, ButtonGroup, Button } from '@mui/material';
-import { styled } from '@mui/material/styles';
-// import SettingsIcon from '@mui/icons-material/Settings';
-// import FormatBoldIcon from '@mui/icons-material/FormatBold';
-// import FormatItalicIcon from '@mui/icons-material/FormatItalic';
-// import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-import { Visibility, VerticalSplit, Code } from '@mui/icons-material';
+import { AppBar, Toolbar, Typography, ButtonGroup, Button, IconButton, Theme } from '@mui/material';
+import { styled, useTheme } from '@mui/material/styles';
+import { Visibility, VerticalSplit, Code, NoteAdd, FileOpen, Save } from '@mui/icons-material';
+import { openFile, saveFile } from '../store/fileSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../store';
 
 const StyledAppBar = styled(AppBar)({
-    WebkitAppRegion: 'drag', // 允许拖动窗口
+    WebkitAppRegion: 'drag',
     backgroundColor: 'transparent',
     boxShadow: 'none',
 });
 
 const TitleToolbar = styled(Toolbar)({
-    minHeight: '38px !important', // 标题栏固定高度
+    minHeight: '38px !important',
     padding: '0 10px 2px 10px !important',
-    paddingLeft: '80px !important', // 为红绿灯按钮留出空间
+    paddingLeft: '80px !important',
 });
 
 const ActionToolbar = styled(Toolbar)({
@@ -25,15 +24,105 @@ const ActionToolbar = styled(Toolbar)({
     borderColor: 'rgba(0, 0, 0, 0.12)',
 });
 
+const buttonStyles = (theme: Theme) => ({
+    transition: 'background-color 0.3s',
+    '&:hover': {
+        backgroundColor: theme.palette.action.hover,
+    },
+    color: theme.palette.mode === 'light' ? theme.palette.text.primary : theme.palette.common.white,
+    '& .MuiSvgIcon-root': {
+        color: theme.palette.mode === 'light' ? theme.palette.text.primary : theme.palette.common.white,
+    }
+});
+
 interface TitleBarProps {
     viewMode: 'preview' | 'split' | 'source';
     setViewMode: React.Dispatch<React.SetStateAction<'preview' | 'split' | 'source'>>;
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({ viewMode, setViewMode }) => {
+    const theme = useTheme();
+    const dispatch = useDispatch();
+    const {filePath, content, isModified} = useSelector((state: RootState) => state.file);
+
+
+    const confirmLevel = async ({onSave, onDiscard, onCancel}: {onSave: () => void, onDiscard: () => void, onCancel: () => void}) => {
+        const result = await window.ipcRenderer.invoke('file:confirm-level');
+        const type = result.actionType;
+
+        if (type === 'discard') {
+            onDiscard();
+        }
+        else if (type === 'save') {
+            onSave();
+        }
+        else {
+            onCancel();
+        }
+    }   
+
+    const onClickNewFile = async () => {
+        console.log("New File Clicked");
+        if (isModified) {
+            await confirmLevel({
+                onSave: async () => {
+                    await handleSaveFile();
+                    await handleNewFile();
+                }, 
+                onDiscard: async () => {
+                    await handleNewFile();
+                }, 
+                onCancel: () => {}
+            });
+        }
+        else
+        {
+            await handleNewFile();
+        }
+    }
+    const handleNewFile = async () => {
+        const result = await window.ipcRenderer.invoke('file:new');
+        if (result.success) {
+            dispatch(openFile({ content: result.content, filePath: result.filePath }));
+        }
+    };
+
+    const onClickOpenFile = async () => {
+        console.log("Open File Clicked");
+        if (isModified) {
+            await confirmLevel({
+                onSave: async () => {
+                    await handleSaveFile();
+                    await handleOpenFile();
+                }, 
+                onDiscard: async () => {
+                    await handleOpenFile();
+                }, 
+                onCancel: () => {}
+            });        }
+        else {
+            await handleOpenFile();
+        }
+    }
+
+    const handleOpenFile = async () => {
+        const result = await window.ipcRenderer.invoke('file:open');
+        if (result.success) {
+            dispatch(openFile({ content: result.content, filePath: result.filePath }));
+        }
+    };
+
+    const handleSaveFile = async () => {
+        console.log("Save File Clicked");
+
+        const result = await window.ipcRenderer.invoke('file:save', { filePath, content });
+        if (result.success) {
+            dispatch(saveFile());
+        }
+    };
+
     return (
         <StyledAppBar position="static">
-            {/* 标题栏 */}
             <TitleToolbar>
                 <Typography
                     variant="subtitle1"
@@ -46,7 +135,7 @@ const TitleBar: React.FC<TitleBarProps> = ({ viewMode, setViewMode }) => {
                         fontWeight: 700
                     }}
                 >
-                    Quillify
+                    Quillify {filePath ? `- ${filePath}` : '- Untitled'} {isModified ? ' *' : ''}
                 </Typography>
                 <ButtonGroup 
                     variant="outlined" 
@@ -57,7 +146,8 @@ const TitleBar: React.FC<TitleBarProps> = ({ viewMode, setViewMode }) => {
                             height: '18px',
                             minHeight: '18px',
                             padding: '0 8px',
-                            minWidth: '38px'
+                            minWidth: '38px',
+                            ...buttonStyles(theme)
                         },
                         '& .MuiSvgIcon-root': {
                             fontSize: '16px'
@@ -85,26 +175,19 @@ const TitleBar: React.FC<TitleBarProps> = ({ viewMode, setViewMode }) => {
                 </ButtonGroup>
             </TitleToolbar>
 
-            {/* 工具栏 */}
             <ActionToolbar>
-                {/* 左侧按钮组 */}
-                <ButtonGroup sx={{ flexGrow: 1 }}>
-                    {/* <IconButton size="small" color="inherit">
-                        <FormatBoldIcon fontSize="small" />
+                <ButtonGroup sx={{ 
+                        WebkitAppRegion: 'no-drag'
+                    }}>
+                    <IconButton size="small" color="inherit" onClick={onClickNewFile} sx={buttonStyles(theme)}>
+                        <NoteAdd fontSize="small" />
                     </IconButton>
-                    <IconButton size="small" color="inherit">
-                        <FormatItalicIcon fontSize="small" />
+                    <IconButton size="small" color="inherit" onClick={onClickOpenFile} sx={buttonStyles(theme)}>
+                        <FileOpen fontSize="small" />
                     </IconButton>
-                    <IconButton size="small" color="inherit">
-                        <FormatListBulletedIcon fontSize="small" />
-                    </IconButton> */}
-                </ButtonGroup>
-
-                {/* 右侧按钮组 */}
-                <ButtonGroup>
-                    {/* <IconButton size="small" color="inherit">
-                        <SettingsIcon fontSize="small" />
-                    </IconButton> */}
+                    <IconButton size="small" color="inherit" onClick={handleSaveFile} sx={buttonStyles(theme)}>
+                        <Save fontSize="small" />
+                    </IconButton>
                 </ButtonGroup>
             </ActionToolbar>
         </StyledAppBar>

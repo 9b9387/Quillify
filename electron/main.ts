@@ -2,6 +2,7 @@ import { app, BrowserWindow } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import fs from 'node:fs'
+import FileService from './services/file-service'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -118,6 +119,9 @@ function createWindow() {
     } else {
         win.loadFile(path.join(RENDERER_DIST, 'index.html'))
     }
+
+    const fileService = new FileService(win);
+    fileService.registerIpcHandlers();
 }
 
 // 修改 window-all-closed 事件处理
@@ -142,11 +146,20 @@ app.on('activate', () => {
 app.whenReady().then(() => {
     createWindow();
     
+    handleFileOpen("/Users/shihongyang/Projects/Quillify/README.md")
     // 如果有待打开的文件，现在打开它
     if (fileToOpen) {
         handleFileOpen(fileToOpen);
         fileToOpen = null;
     }
+
+    // 确保窗口成为活动窗口
+    if (process.platform === 'darwin') {
+        app.dock.show();  // macOS 上显示 dock 图标
+    }
+    
+    // 将应用程序带到前台
+    app.focus({ steal: true });
 });
 
 if (process.platform === 'darwin') {

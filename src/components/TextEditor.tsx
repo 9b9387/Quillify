@@ -1,26 +1,21 @@
-import { useEffect, useState } from 'react';
+// import { useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 import CodeMirror from '@uiw/react-codemirror';
 import { EditorView } from '@codemirror/view';
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { syntaxHighlighting, defaultHighlightStyle } from '@codemirror/language';
 import { languages } from '@codemirror/language-data';
+import { RootState } from '../store';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateContent } from '../store/fileSlice';
 
 const TextEditor = () => {
-    const [content, setContent] = useState('');
+    const content = useSelector((state: RootState) => state.file.content);
+    const dispatch = useDispatch();
 
-    useEffect(() => {
-        const handleFileOpen = (_event: any, data: { content: string; filePath: string }) => {
-            console.log('handleFileOpen', data.filePath);
-            setContent(data.content);
-        }
-
-        window.ipcRenderer.on('file-opened', handleFileOpen);
-
-        return () => {
-            window.ipcRenderer.off('file-opened', handleFileOpen);
-        }
-    }, []);
+    const handleChange = (value: string) => {
+        dispatch(updateContent({ content: value }));
+    }
 
     const theme = EditorView.theme({
         '&': {
@@ -62,7 +57,7 @@ const TextEditor = () => {
         }}>
             <CodeMirror
                 value={content}
-                onChange={(value) => setContent(value)}
+                onChange={handleChange}
                 height="100%"
                 width="100%"         // 设置宽度为100%
                 theme={theme}
