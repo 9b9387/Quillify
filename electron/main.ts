@@ -146,7 +146,6 @@ app.on('activate', () => {
 app.whenReady().then(() => {
     createWindow();
     
-    handleFileOpen("/Users/shihongyang/Projects/Quillify/README.md")
     // 如果有待打开的文件，现在打开它
     if (fileToOpen) {
         handleFileOpen(fileToOpen);

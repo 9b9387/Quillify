@@ -1,4 +1,3 @@
-// import { useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 import CodeMirror from '@uiw/react-codemirror';
 import { EditorView } from '@codemirror/view';
@@ -45,6 +44,7 @@ const TextEditor = () => {
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
+            overflow: 'auto',
             '& .cm-editor': {
                 height: '100%',
                 flex: 1,
