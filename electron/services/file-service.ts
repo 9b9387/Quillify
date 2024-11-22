@@ -12,11 +12,15 @@ interface UserActionResult {
     actionType: 'save' | 'discard' | 'cancel';
 }
 
-class FileService {
-    private mainWindow: BrowserWindow;
+export default class FileService {
+    private win: BrowserWindow;
 
     constructor(window: BrowserWindow) {
-        this.mainWindow = window;
+        this.win = window;
+    }
+
+    updateWindow(window: BrowserWindow) {
+        this.win = window;
     }
 
     registerIpcHandlers() {
@@ -40,7 +44,7 @@ class FileService {
     }
 
     async showLevelConfirmDialog(): Promise<UserActionResult> {
-        const { response } = await dialog.showMessageBox(this.mainWindow, {
+        const { response } = await dialog.showMessageBox(this.win, {
             type: 'question',
             buttons: ['保存', '不保存', '取消'],
             message: '是否保存当前的变更?',
@@ -52,7 +56,7 @@ class FileService {
 
     async openFile(): Promise<FileServiceResult> {
         try {
-            const { canceled, filePaths } = await dialog.showOpenDialog(this.mainWindow, {
+            const { canceled, filePaths } = await dialog.showOpenDialog(this.win, {
                 properties: ['openFile'],
                 filters: [
                     { name: 'Markdown', extensions: ['md', 'markdown', 'mdown', 'mkd'] },
@@ -83,7 +87,7 @@ class FileService {
     async saveFile(path: string, content: string): Promise<FileServiceResult> {
 
         if(path === '' || path === null) {
-            const { canceled, filePath } = await dialog.showSaveDialog(this.mainWindow, {
+            const { canceled, filePath } = await dialog.showSaveDialog(this.win, {
                 filters: [
                     { name: 'Markdown', extensions: ['md', 'markdown', 'mdown', 'mkd'] },
                     { name: 'All Files', extensions: ['*'] }
@@ -118,5 +122,3 @@ class FileService {
         };
     }
 }
-
-export default FileService;

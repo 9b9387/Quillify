@@ -25,6 +25,7 @@ export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 'public') : RENDERER_DIST
 
 let win: BrowserWindow | null
+let fileService: FileService | null = null;
 
 function handleFileOpen(filePath: string) {
     if (!filePath) return
@@ -120,8 +121,12 @@ function createWindow() {
         win.loadFile(path.join(RENDERER_DIST, 'index.html'))
     }
 
-    const fileService = new FileService(win);
-    fileService.registerIpcHandlers();
+    if (!fileService) {
+        fileService = new FileService(win);
+        fileService.registerIpcHandlers();
+    } else {
+        fileService.updateWindow(win);
+    }
 }
 
 // 修改 window-all-closed 事件处理
