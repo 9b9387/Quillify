@@ -1,23 +1,27 @@
-import { ReactNode } from 'react';
+import React from 'react';
 import { Box } from '@mui/material';
+import TitleBar from './TitleBar';
 
-interface LayoutProps {
-    header?: ReactNode;
-    content?: ReactNode;
-    sidebar?: ReactNode;
-    footer?: ReactNode;
+interface AppLayoutProps {
+    header: React.ReactElement<typeof TitleBar>;
+    content: React.ReactNode;
+    footer?: React.ReactNode;
 }
 
-const Layout = ({ header, content, sidebar, footer }: LayoutProps) => {
+const AppLayout: React.FC<AppLayoutProps> = ({
+    header,
+    content,
+    footer
+}) => {
     return (
         <Box sx={{ 
             height: '100vh',
+            width: '100vw',
             display: 'flex', 
             flexDirection: 'column',
             overflow: 'hidden'
         }}>
-            {/* 头部区域 */}
-            {header && (
+            {(
                 <Box sx={{ 
                     flexShrink: 0,
                     borderBottom: 1,
@@ -27,26 +31,11 @@ const Layout = ({ header, content, sidebar, footer }: LayoutProps) => {
                 </Box>
             )}
 
-            {/* 主要内容区域 */}
             <Box sx={{ 
                 flex: 1,
                 display: 'flex',
                 minHeight: 0
             }}>
-                {/* 侧边栏 */}
-                {sidebar && (
-                    <Box sx={{ 
-                        width: 240,
-                        flexShrink: 0,
-                        borderRight: 1,
-                        borderColor: 'divider',
-                        overflow: 'auto'
-                    }}>
-                        {sidebar}
-                    </Box>
-                )}
-
-                {/* 内容区域 */}
                 <Box sx={{ 
                     flex: 1,
                     overflow: 'auto',
@@ -56,7 +45,6 @@ const Layout = ({ header, content, sidebar, footer }: LayoutProps) => {
                 </Box>
             </Box>
 
-            {/* 底部区域 */}
             {footer && (
                 <Box sx={{ 
                     flexShrink: 0,
@@ -70,4 +58,4 @@ const Layout = ({ header, content, sidebar, footer }: LayoutProps) => {
     );
 };
 
-export default Layout; 
+export default AppLayout;

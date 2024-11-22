@@ -4,9 +4,10 @@ import CssBaseline from '@mui/material/CssBaseline';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import store from './store';
 import { Provider } from 'react-redux';
-import Layout from './components/Layout';
 import TitleBar from "./components/TitleBar";
 import MarkdownEditor from "./components/MarkdownEditor";
+import AppLayout from './components/AppLayout';
+import { Box } from '@mui/material';
 
 function App() {
     const [viewMode, setViewMode] = useState<'preview' | 'split' | 'source'>('source');
@@ -25,17 +26,13 @@ function App() {
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <Provider store={store}>
-            <Layout 
-                header={
-                    <TitleBar viewMode={viewMode} setViewMode={setViewMode} />
-                }
-                content={
-                    <MarkdownEditor viewMode={viewMode} />
-                }
+            <AppLayout 
+                header={<TitleBar viewMode={viewMode} setViewMode={setViewMode} />}
+                content={<MarkdownEditor viewMode={viewMode} />}
                 // 示例：如果需要侧边栏
                 // sidebar={<SideBar />}
                 // 示例：如果需要底部状态栏
-                // footer={<StatusBar />}
+                footer={<Box sx={{ flexShrink: 0, height: 24 }} />}
             />
             </Provider>
         </ThemeProvider>
