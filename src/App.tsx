@@ -8,8 +8,16 @@ import TitleBar from "./components/TitleBar";
 import AppLayout from './components/AppLayout';
 import { Box } from '@mui/material';
 import MarkdownEditor from './components/MarkdownEditor';
+import IpcService from './services/IpcService';
+import { openFile } from './store/fileSlice';
 
 function App() {
+    const ipcService = IpcService.getInstance();
+    ipcService.on('file-opened', (data: { content: string, filePath: string }) => {
+        console.log('App received file-opened event', data);
+        store.dispatch(openFile(data));
+    });
+
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
     const theme = useMemo(() =>

@@ -69,6 +69,17 @@ export default class FileService {
             }
 
             const filePath = filePaths[0];
+            return await this.openFileByPath(filePath); 
+        } catch (error) {
+            return {
+                success: false,
+                error: error as Error
+            };
+        }
+    }
+
+    async openFileByPath(filePath: string): Promise<FileServiceResult> {
+        try {
             const content = fs.readFileSync(filePath, 'utf-8');
             return {
                 success: true,
