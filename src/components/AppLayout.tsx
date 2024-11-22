@@ -33,16 +33,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({
 
             <Box sx={{ 
                 flex: 1,
-                display: 'flex',
-                minHeight: 0
+                overflow: 'hidden',
+                position: 'relative'
             }}>
-                <Box sx={{ 
-                    flex: 1,
-                    overflow: 'auto',
-                    position: 'relative'
-                }}>
-                    {content}
-                </Box>
+                {content}
             </Box>
 
             {footer && (

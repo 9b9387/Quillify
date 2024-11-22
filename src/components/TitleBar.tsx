@@ -4,6 +4,7 @@ import { Visibility, VerticalSplit, Code, NoteAdd, FileOpen, Save } from '@mui/i
 import { openFile, saveFile } from '../store/fileSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
+import { setViewMode } from '../store/viewSlice';
 
 const StyledAppBar = styled(AppBar)({
     WebkitAppRegion: 'drag',
@@ -35,15 +36,11 @@ const buttonStyles = (theme: Theme) => ({
     }
 });
 
-interface TitleBarProps {
-    viewMode: 'preview' | 'split' | 'source';
-    setViewMode: React.Dispatch<React.SetStateAction<'preview' | 'split' | 'source'>>;
-}
-
-const TitleBar: React.FC<TitleBarProps> = ({ viewMode, setViewMode }) => {
+const TitleBar: React.FC = () => {
     const theme = useTheme();
     const dispatch = useDispatch();
     const {filePath, content, isModified} = useSelector((state: RootState) => state.file);
+    const viewMode = useSelector((state: RootState) => state.view.mode);
 
 
     const confirmLevel = async ({onSave, onDiscard, onCancel}: {onSave: () => void, onDiscard: () => void, onCancel: () => void}) => {
@@ -155,19 +152,19 @@ const TitleBar: React.FC<TitleBarProps> = ({ viewMode, setViewMode }) => {
                     }}
                 >
                     <Button 
-                        onClick={() => setViewMode('preview')}
+                        onClick={() => dispatch(setViewMode('preview'))}
                         variant={viewMode === 'preview' ? 'contained' : 'outlined'}
                     >
                         <Visibility fontSize="small" />
                     </Button>
                     <Button 
-                        onClick={() => setViewMode('split')}
+                        onClick={() => dispatch(setViewMode('split'))}
                         variant={viewMode === 'split' ? 'contained' : 'outlined'}
                     >
                         <VerticalSplit fontSize="small" />
                     </Button>
                     <Button 
-                        onClick={() => setViewMode('source')}
+                        onClick={() => dispatch(setViewMode('source'))}
                         variant={viewMode === 'source' ? 'contained' : 'outlined'}
                     >
                         <Code fontSize="small" />
