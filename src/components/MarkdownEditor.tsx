@@ -12,6 +12,7 @@ import { updateContent } from '../store/fileSlice';
 import { search } from '@codemirror/search';
 import { SearchPanel } from './SearchPanel';
 import { createRoot } from 'react-dom/client';
+import MarkdownToolbar from './MarkdownToolbar';
 
 interface MDEditorProps {
     value?: string;
@@ -133,6 +134,8 @@ const MarkdownEditor = React.forwardRef<MDEditorRef, MDEditorProps>((props, ref)
         preview: preview
     }));
 
+    const [editorView, setEditorView] = useState<EditorView | null>(null);
+
     return (
         <Box 
             ref={containerRef}
@@ -147,6 +150,8 @@ const MarkdownEditor = React.forwardRef<MDEditorRef, MDEditorProps>((props, ref)
                 display: viewMode === 'preview' ? 'none' : 'block',
                 width: viewMode === 'split' ? '50%' : '100%'
             }}>
+                <MarkdownToolbar editor={editorView} />
+            
                 <CodeMirror
                     value={content}
                     height={editorHeight}
@@ -161,7 +166,14 @@ const MarkdownEditor = React.forwardRef<MDEditorRef, MDEditorProps>((props, ref)
                         autocompletion: true,
                         closeBracketsKeymap: true
                     }}
-                    extensions={extensions}
+                    extensions={[
+                        ...extensions,
+                        EditorView.updateListener.of(update => {
+                            if (update.view) {
+                                setEditorView(update.view);
+                            }
+                        })
+                    ]}
                     onChange={handleChange}
                     ref={codeMirror}
                 />

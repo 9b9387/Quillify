@@ -25,7 +25,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                 <Box sx={{ 
                     flexShrink: 0,
                     borderBottom: 1,
-                    borderColor: 'divider'
+                    borderColor: 'divider',
+                    height: '68px'
                 }}>
                     {header}
                 </Box>

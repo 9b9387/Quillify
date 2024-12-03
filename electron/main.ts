@@ -75,7 +75,6 @@ function createWindow() {
     // 添加窗口加载完成的处理
     win.webContents.on('did-finish-load', () => {
         win?.webContents.send('main-process-message', 'window-loaded')
-        fileToOpen = "/Users/shihongyang/Projects/Quillify/README.md"
         if (fileToOpen) {
             fileService!.openFileByPath(fileToOpen).then((result) => {
                 console.log('Open file result:', result);
@@ -91,10 +90,6 @@ function createWindow() {
     } else {
         win.loadFile(path.join(RENDERER_DIST, 'index.html'))
     }
-
-
-
-
 }
 
 // 修改 window-all-closed 事件处理
